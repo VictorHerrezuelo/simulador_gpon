@@ -32,7 +32,7 @@ else:
     N_COLAS = 1
 N_SOURCES = [3, 5, 24]      # Número de Sources de las fuentes de Pareto de cada tipo (hacer ésto con un diccionario)        
 a = 1.2
-carga = CONFIG_CARGA
+#carga = CONFIG_CARGA
 
 # media = .5e-4
 media = .8e-4
@@ -44,7 +44,7 @@ m_on = m
 a_on = a
 
 # Para los periodos de OFF
-m_off = m_on*(1-carga)/carga
+# m_off = m_on*(1-carga)/carga
 a_off = a
 
 # T_SIM = 5e3*T_TRAMA     # Tiempo de simulación (s)

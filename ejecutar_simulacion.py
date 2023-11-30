@@ -19,16 +19,19 @@ from packages.classes.Enlace import Enlace
 from packages.configuration.parameters import *
 
 
-def ejecutar_simulacion():         
+def ejecutar_simulacion(carga):         
     ### Simulación
+    foo=carga-0.2
+    foo2 = 10/foo
+    print(foo2)
     start_time = time.time() # medimos el tiempo que tarda la simulación
-    print('\033c')
-    print('# Comienza simulación:')
+    #print('\033c')
+    print(f"# Comienza simulación: (carga = {carga})")
     
     ## Escritura en un fichero
     start_time_str = time.strftime("%Y%m%d_%H%M", time.gmtime())
     subdirectory= "data"
-    filename = f"summary-carga_0{CONFIG_CARGA*10:.0f}-{start_time_str}.txt"
+    filename = f"summary-carga_0{carga*10:.0f}-{start_time_str}.txt"
     file_path = os.path.join(subdirectory, filename)
     f = open(file_path, "a")
 
@@ -45,7 +48,7 @@ def ejecutar_simulacion():
         onts = []
 
         for i in range(N_ONTS): 
-            capas_app_ont.append(GeneraTrafico(env, i, i*datetime.utcnow().microsecond // 1000))
+            capas_app_ont.append(GeneraTrafico(env, i, carga, i*datetime.utcnow().microsecond // 1000))
             onts.append(ONT(env, i, capas_app_ont[i], splitter_downstream, splitter_upstream))
 
         olt = OLT(env, splitter_upstream, splitter_downstream)
@@ -314,7 +317,7 @@ def ejecutar_simulacion():
         stats.print_stats()
 
     ## Guardamos en un fichero el tamaño medio de las colas de cada onu
-    filename_csv_colas = f"colas-carga_0{CONFIG_CARGA*10:.0f}-{start_time_str}.csv"
+    filename_csv_colas = f"colas-carga_0{carga*10:.0f}-{start_time_str}.csv"
     csv_colas = open(os.path.join(subdirectory, filename_csv_colas), "w")
     csv_colas_writer = csv.writer(csv_colas, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 

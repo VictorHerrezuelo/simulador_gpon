@@ -9,7 +9,7 @@ import csv
 class GeneraTrafico:
     # Simula por una parte la capa de aplicación que va generando daos a una velocidad R_datos, 
     # y por otra simula la capa de transporte que va segmentando los datos en datagramas de 1500 Bytes
-    def __init__(self, env, id, seed_1=None, seed_2=None):
+    def __init__(self, env, id, carga, seed_1=None, seed_2=None):
         # self.colas es un array que va guardando los paquetes en un bitarrray uno detrás de otro.
         # self.bytes descartados va contando los bytes descartados en total en la ONT.
         # self.bytes generados va contando los bytes generados en total en la ONT.
@@ -33,7 +33,7 @@ class GeneraTrafico:
         pareto_generator_on_class = ParetoGenerator()
         pareto_generator_off_class = ParetoGenerator()
         self.generador_pareto_on = pareto_generator_on_class.pareto_generator(self.rng_on, a_on, m_on)
-        self.generador_pareto_off = pareto_generator_off_class.pareto_generator(self.rng_off, a_off, m_off)
+        self.generador_pareto_off = pareto_generator_off_class.pareto_generator(self.rng_off, a_off, m_on*(1-carga)/carga)
 
 
 
