@@ -1,5 +1,5 @@
 # A través de este fichero configuramos rápidamente los parámetros relevantes de la simulación.
-CONFIG_T_SIM=.01
+CONFIG_T_SIM=2000
 CONFIG_CARGA=[.1,.2,.3,.4,.5,.6,.7,.8,.9]
 
 ## Configuración
