@@ -21,9 +21,6 @@ from packages.configuration.parameters import *
 
 def ejecutar_simulacion(carga):         
     ### Simulación
-    foo=carga-0.2
-    foo2 = 10/foo
-    print(foo2)
     start_time = time.time() # medimos el tiempo que tarda la simulación
     #print('\033c')
     print(f"# Comienza simulación: (carga = {carga})")

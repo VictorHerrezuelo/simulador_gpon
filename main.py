@@ -14,7 +14,6 @@ def main():
         try:
             ejecutar_simulacion(CONFIG_CARGA[i])
         except Exception as e:
-
             # Atrapar cualquier excepción
             print(f"Ha ocurrido un error: {e}")
 
