@@ -8,7 +8,7 @@ def main():
     # Ejecutamos la simulacion
     ejecutar_simulacion()
     # Calculamos las estadísticas
-    calcular_estadisticas()
+    #calcular_estadisticas()
 
 if __name__ == '__main__':
     main()

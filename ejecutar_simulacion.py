@@ -33,15 +33,9 @@ def ejecutar_simulacion():
     f = open(file_path, "a")
 
 
-
     with cProfile.Profile() as pr:
         # Creamos una instancia del entorno de simulación
         env = simpy.Environment()
-
-        # Creamos los ficheros donde vamos a guardar los datos de la simulación
-        csv_retardos = open(os.path.join(subdirectory, f"retardos-carga_0{CONFIG_CARGA*10:.0f}-{start_time_str}.csv"), "w")
-        csv_retardos_writer = csv.writer(csv_retardos, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        csv_retardos_writer.writerow(["ont_id", "t_sim", "prioridad", "retardo"])
 
         # Declaramos y configuramos los diferentes elementos de la red
         splitter_downstream = Enlace(env, N_ONTS)
@@ -54,16 +48,27 @@ def ejecutar_simulacion():
             capas_app_ont.append(GeneraTrafico(env, i, i*datetime.utcnow().microsecond // 1000))
             onts.append(ONT(env, i, capas_app_ont[i], splitter_downstream, splitter_upstream))
 
-        olt = OLT(env, csv_retardos, splitter_upstream, splitter_downstream)
+        olt = OLT(env, splitter_upstream, splitter_downstream)
 
         # Iniciamos simulación
         env.run(until=T_SIM)
+
+        # Guardamos los retardos
 
         # Borramos el mensaje de % progreso
         sys.stdout.write('\r' + ' ' * 50 + '\r')
         sys.stdout.flush()
 
         print()
+
+        ## Escritura en un fichero del resumen de retardos
+        csv_retardos_summary = open(os.path.join(subdirectory, f"retardos_summary_{start_time_str}.csv"), "w")
+        csv_retardos_summary_writer = csv.writer(csv_retardos_summary, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        csv_retardos_summary_writer.writerow(["ont", "prioridad", "retardo_medio", "intervalo_confianza_left", "intervalo_confianza_right"])
+
+        for i in range(N_ONTS):
+            for j in range(N_COLAS):
+                csv_retardos_summary_writer.writerow([i, j, olt.retardos_estadisticas[i][j].media, olt.retardos_estadisticas[i][j].intervalo_confianza()[0], olt.retardos_estadisticas[i][j].intervalo_confianza()[1]])
 
 
     print('# Fin de la simulación. Datos relevantes: ')
@@ -88,8 +93,7 @@ def ejecutar_simulacion():
         Bytes_descartados.append(onts[i].generador_trafico.Bytes_descartados)
         paquetes_generados.append(onts[i].generador_trafico.paquetes_generados)
         paquetes_descartados.append(onts[i].generador_trafico.paquetes_descartados)
-        if(len(olt.retardos[i])!=0):
-            retardos_medios.append(sum(olt.retardos[i])/len(olt.retardos[i]))
+        retardos_medios.append(sum(olt.retardos_estadisticas[i][j].media for j in range(N_COLAS))/N_COLAS)
 
     # recogemos lo que tarda la simulación
     end_time = time.time()
@@ -318,3 +322,5 @@ def ejecutar_simulacion():
     for i in range(N_ONTS):
         csv_colas_writer.writerow([i, colas[i]/8])
     csv_colas_writer.writerow(["media", sum(colas)/8/len(colas)])
+
+    

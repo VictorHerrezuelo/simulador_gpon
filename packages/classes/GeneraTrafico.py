@@ -1,6 +1,7 @@
 from packages.configuration.parameters import *
 from packages.classes.ParetoGenerator import ParetoGenerator
 from packages.classes.TramaEthernet import TramaEthernet
+from packages.classes.EstadisticasWelford import EstadisticasWelford
 import numpy as np
 import csv
 
@@ -24,6 +25,7 @@ class GeneraTrafico:
         self.carga_onu = 0 # carga de la onu en bps
         self.i_on_total = []
         self.i_off_total = []
+        self.retardo_estadisticas = []
 
         # Generador de números de pareto
         self.rng_on = np.random.RandomState(seed_1)
@@ -44,6 +46,7 @@ class GeneraTrafico:
             # Cada ONT tiene N_COLAS colas. Aquí inicializamos las colas
             self.colas.append([])
             self.colas_longitudes.append(0)
+            self.retardo_estadisticas.append(EstadisticasWelford())
 
 
     def encolador_colas_separadas(self, paquete, prioridad):

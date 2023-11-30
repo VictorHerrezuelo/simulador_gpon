@@ -2,15 +2,15 @@ from packages.configuration.parameters import *
 from packages.classes.MensajeGate import MensajeGate
 from packages.classes.MensajeReport import MensajeReport
 from packages.classes.TramaEthernet import TramaEthernet
+from packages.classes.EstadisticasWelford import EstadisticasWelford
 import csv
 
 
 ## OLT
 class OLT:
     # Simula la OLT
-    def __init__(self, env, csv_datos, splitter_in, splitter_out):
+    def __init__(self, env, splitter_in, splitter_out):
         self.env = env
-        self.csv_datos = csv_datos
         self.splitter_in = splitter_in # enlace que representa el Splitter en sentido Upstream
         self.splitter_out = splitter_out # enlace que representa el Splitter en sentido Downstream
         self.B_demand = [] # vector que representa la ventana asignada a cada ONT en bits
@@ -22,29 +22,32 @@ class OLT:
         self.colas_tamanos = [] # Registro del tamaño de cada cola en bits
         self.w_sla = []         # Ponderaciones de cada SLA
         self.B_max = []    # BW máximo asignado a cada onu, en número de tramas enviables
-        self.retardos = [] 
         self.contador_paquetes_recibidos_olt = 0 # cuenta el total de paquetes llegados a la olt
         self.contador_Bytes_recibidos_olt = 0 # cuenta el total de Bytes llegados a la olt (payload+cabeceras, sin contar reports)
         self.contador_gates = 0 # cuenta el total de gates enviados por la olt
+        self.retardos_estadisticas = [] # vector que recoge las estadísticas de retardo de cada ONU
         self.action = env.process(self.escucha_splitter(self.env))
         self.action = env.process(self.enviar_gate_inicial(self.env))
+
 
         for i in range(N_ONTS):
             # Iniicalizamos variables
             self.colas_tamanos.append([])
+            self.retardos_estadisticas.append([])
             self.w_sla.append(1)        # Suponemos para toda ONUs tenemos un SLA_0 donde w=1
             self.B_demand.append(0)
             self.B_alloc.append(B_inicial)
             self.B_alloc_acum.append(B_inicial)
             self.n_alloc.append(1)
             self.T_alloc.append(0)
-            self.retardos.append([])
             self.t_inicio_tx.append(0)
+            
 
         for i in range(N_ONTS):
             # Inicializamos las colas
             for j in range(N_COLAS):
                 self.colas_tamanos[i].append(0)
+                self.retardos_estadisticas[i].append(EstadisticasWelford())
 
         B_AVAILABLE = T_AVAILABLE*R_tx
         
@@ -141,11 +144,9 @@ class OLT:
 
         # Actualizamos la tabla de retardos
         retardo = timestamp_llegada - timestamp_creacion
-        self.retardos[id_ont].append(retardo)
 
-        # Guardamos el retardo en el fichero
-        csv_writer = csv.writer(self.csv_datos)
-        csv_writer.writerow([id_ont, self.env.now, trama.prioridad, retardo])
+        # Actualizamos las estadísticas de retardo
+        self.retardos_estadisticas[id_ont][trama.prioridad].actualizar(retardo)
 
     def enviar_gate_inicial(self, env):
         # Al inicio de la simulación enviamos mensajes gate para que las ONTs comiencen a transmitir
