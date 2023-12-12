@@ -28,7 +28,7 @@ def ejecutar_simulacion(carga):
     ## Escritura en un fichero
     start_time_str = time.strftime("%Y%m%d_%H%M", time.gmtime())
     subdirectory= "data"
-    filename = f"summary-carga_0{carga*10:.0f}-{start_time_str}.txt"
+    filename = f"summary-carga_0{carga*1000:.0f}-{start_time_str}.txt"
     file_path = os.path.join(subdirectory, filename)
     f = open(file_path, "a")
 
@@ -62,7 +62,7 @@ def ejecutar_simulacion(carga):
         print()
 
         ## Escritura en un fichero del resumen de retardos
-        csv_retardos_summary = open(os.path.join(subdirectory, f"retardos_summary_{start_time_str}.csv"), "w")
+        csv_retardos_summary = open(os.path.join(subdirectory, f"retardos-summary-carga_0{carga*1000:.0f}-{start_time_str}.csv"), "w")
         csv_retardos_summary_writer = csv.writer(csv_retardos_summary, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL)
         csv_retardos_summary_writer.writerow(["ont", "prioridad", "retardo_medio", "intervalo_confianza_left", "intervalo_confianza_right"])
 

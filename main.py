@@ -9,7 +9,7 @@ import csv
 
 ## Simulación
 def main():
-    for i in range(8):
+    for i in range(len(CONFIG_CARGA)):
         # Ejecutamos la simulacion
         try:
             ejecutar_simulacion(CONFIG_CARGA[i])
